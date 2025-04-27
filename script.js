@@ -27,8 +27,14 @@ function encodePassword(password) {
 
 async function predictStrength() {
     const password = document.getElementById('passwordInput').value;
-    const encoded = encodePassword(password);
+    const resultDiv = document.getElementById('result');
 
+    if (password.trim() === "") {
+        resultDiv.style.display = "none";
+        return;
+    }
+
+    const encoded = encodePassword(password);
     const tensor = new ort.Tensor('int32', encoded, [1, maxLength]);
     const feeds = { input: tensor };
     const output = await session.run(feeds);
@@ -41,5 +47,15 @@ async function predictStrength() {
     else if (predictedClass === 1) strength = 'Average';
     else if (predictedClass === 2) strength = 'Strong';
 
-    document.getElementById('result').innerText = `Predicted Strength: ${strength}`;
+    resultDiv.innerText = `Predicted Strength: ${strength}`;
+    resultDiv.style.display = "block";
+}
+
+function togglePassword() {
+    const passwordField = document.getElementById('passwordInput');
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+    } else {
+        passwordField.type = "password";
+    }
 }
